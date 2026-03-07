@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestão de Prospecção</title>
+    <link rel="stylesheet" href="style.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+</head>
+<body>
+    <div class="dashboard-container">
+        <header>
+            <h1>Gestão de Prospecção</h1>
+            <div class="month-selector">
+                <button class="month-btn">Jan</button>
+                <button class="month-btn">Fev</button>
+                <button class="month-btn active">Mar</button>
+                <button class="month-btn">Abr</button>
+                <button class="month-btn">Mai</button>
+                <button class="month-btn">Jun</button>
+                <button class="month-btn">Jul</button>
+                <button class="month-btn">Ago</button>
+                <button class="month-btn">Set</button>
+                <button class="month-btn">Out</button>
+                <button class="month-btn">Nov</button>
+                <button class="month-btn">Dez</button>
+            </div>
+        </header>
+
+        <div class="controls-bar">
+            <div class="time-filters">
+                <button class="filter-btn active">Diário</button>
+                <button class="filter-btn">Semanal</button>
+                <button class="filter-btn">Mensal</button>
+            </div>
+            <div class="actions">
+                <select class="collaborator-select">
+                    <option value="todos">Todos Colaboradores</option>
+                </select>
+                <button class="btn-primary"><i class="fas fa-plus"></i> Registrar</button>
+            </div>
+        </div>
+
+        <section class="kpi-grid">
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="icon-box"><i class="fas fa-address-book"></i></div>
+                    <span>Clientes</span>
+                </div>
+                <h2>0.0</h2>
+                <p>Média por colaborador</p>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="icon-box"><i class="fas fa-comment-dots"></i></div>
+                    <span>Conversas</span>
+                </div>
+                <h2>0.0</h2>
+                <p>Média por colaborador</p>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="icon-box"><i class="fas fa-file-invoice"></i></div>
+                    <span>Propostas</span>
+                </div>
+                <h2>0.0</h2>
+                <p>Média por colaborador</p>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="icon-box"><i class="fas fa-handshake"></i></div>
+                    <span>Negociações</span>
+                </div>
+                <h2>0.0</h2>
+                <p>Média por colaborador</p>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="icon-box"><i class="fas fa-dollar-sign"></i></div>
+                    <span>Vendas</span>
+                </div>
+                <h2>0.0</h2>
+                <p>Média por colaborador</p>
+            </div>
+            <div class="kpi-card">
+                <div class="kpi-header">
+                    <div class="icon-box"><i class="fas fa-bolt"></i></div>
+                    <span>Taxa Conv.</span>
+                </div>
+                <h2 class="text-red">0%</h2>
+                <p>Neg. &rarr; Ven.</p>
+            </div>
+        </section>
+
+        <section class="panel-section">
+            <h3 class="section-title text-red">Totais do Período</h3>
+            <div class="totals-grid">
+                <div class="total-box">
+                    <span>Clientes</span>
+                    <h4>0</h4>
+                </div>
+                <div class="total-box">
+                    <span>Conversas</span>
+                    <h4>0</h4>
+                </div>
+                <div class="total-box">
+                    <span>Propostas</span>
+                    <h4>0</h4>
+                </div>
+                <div class="total-box">
+                    <span>Negociações</span>
+                    <h4>0</h4>
+                </div>
+                <div class="total-box">
+                    <span>Vendas</span>
+                    <h4>0</h4>
+                </div>
+                <div class="total-box border-red">
+                    <span>Conversão</span>
+                    <h4 class="text-red">0%</h4>
+                </div>
+            </div>
+        </section>
+
+        <section class="panel-section">
+            <h3 class="section-title text-red">Taxas de Conversão do Funil</h3>
+            <div class="conversion-grid">
+                <div class="total-box">
+                    <span>Clientes &rarr; Conversas</span>
+                    <h4>0%</h4>
+                </div>
+                <div class="total-box">
+                    <span>Conversas &rarr; Propostas</span>
+                    <h4>0%</h4>
+                </div>
+                <div class="total-box">
+                    <span>Propostas &rarr; Negociações</span>
+                    <h4>0%</h4>
+                </div>
+                <div class="total-box border-red">
+                    <span>Clientes &rarr; Negociações</span>
+                    <h4 class="text-red">0%</h4>
+                </div>
+            </div>
+        </section>
+
+        <section class="charts-section">
+            <div class="chart-panel">
+                <h3>Visão Geral por Período</h3>
+                <div class="chart-placeholder">
+                    <div class="legend">
+                        <span class="legend-item"><span class="color-box red"></span> Clientes</span>
+                        <span class="legend-item"><span class="color-box yellow"></span> Conversas</span>
+                        <span class="legend-item"><span class="color-box green"></span> Propostas</span>
+                        <span class="legend-item"><span class="color-box dark-red"></span> Negociações</span>
+                    </div>
+                    <div class="chart-area-mockup"></div>
+                </div>
+            </div>
+            <div class="chart-panel">
+                <h3>Funil de Prospecção</h3>
+                <div class="funnel-placeholder">
+                    <div class="funnel-row"><span>Clientes</span></div>
+                    <div class="funnel-row"><span>Conversas</span></div>
+                </div>
+            </div>
+        </section>
+    </div>
+    <script src="script.js"></script>
+</body>
+</html>
