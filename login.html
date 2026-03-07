@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login - Gestão de Prospecção</title>
+    <link rel="stylesheet" href="login.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="shortcut icon" href="prospec-icon.png" type="image/x-icon">
+</head>
+
+<body>
+    <div class="login-container">
+        <div class="login-box">
+            <div class="logo-container">
+                <img src="prospec-icon.png" alt="Prospec Logo" class="logo">
+            </div>
+            <h2>Bem-vindo de volta</h2>
+            <p class="subtitle">Faça login para acessar o painel de prospecção</p>
+
+            <form id="login-form">
+                <div class="input-group">
+                    <label><i class="fas fa-envelope"></i> E-mail</label>
+                    <input type="email" id="email" required placeholder="Digite seu e-mail">
+                </div>
+                <div class="input-group">
+                    <label><i class="fas fa-lock"></i> Senha</label>
+                    <input type="password" id="senha" required placeholder="Digite sua senha">
+                </div>
+
+                <div class="options">
+                    <label class="remember">
+                        <input type="checkbox"> Lembrar-me
+                    </label>
+                    <a href="#" class="forgot-password">Esqueceu a senha?</a>
+                </div>
+
+                <button type="submit" class="btn-primary full-width">Entrar</button>
+            </form>
+        </div>
+    </div>
+    <script type="module" src="login.js"></script>
+</body>
+<button id="theme-toggle" class="theme-btn-login" aria-label="Alternar tema">
+    <i class="fas fa-sun"></i>
+</button>
+
+</html>

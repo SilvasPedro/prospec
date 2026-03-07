@@ -44,6 +44,9 @@ function inicializarFiltros() {
     });
 
     mudarPeriodoUI('Diário'); // Inicia focado nos resultados do dia
+    
+    // --- ADICIONE ESTA LINHA ABAIXO ---
+    carregarDashboard(); // Força o carregamento dos dados assim que a página abre
 }
 
 function mudarPeriodoUI(periodo) {

@@ -1,0 +1,197 @@
+:root {
+    --bg-dark: #07090f;
+    --bg-panel: #11131a;
+    --bg-element: #1c1e26;
+    --color-red: #d32f2f;
+    --color-red-light: #ff4d4d;
+    --text-main: #ffffff;
+    --text-muted: #8b8d96;
+    --border-color: #2a2d38;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+body {
+    background-color: var(--bg-dark);
+    color: var(--text-main);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    min-height: 100vh;
+    overflow: hidden; /* Evita barra de rolagem durante a animação */
+}
+
+.login-container {
+    width: 100%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 20px;
+}
+
+.login-box {
+    background-color: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    border-top: 3px solid var(--color-red);
+    padding: 40px;
+    border-radius: 12px;
+    width: 100%;
+    max-width: 420px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
+    
+    /* Animação inicial de entrada */
+    opacity: 0;
+    transform: translateY(40px);
+    animation: fadeSlideUp 0.8s ease forwards;
+}
+
+@keyframes fadeSlideUp {
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.logo-container {
+    text-align: center;
+    margin-bottom: 25px;
+}
+
+.logo {
+    width: 80px;
+    height: auto;
+    /* Animação de pulso contínuo */
+    animation: pulse 2.5s infinite ease-in-out;
+}
+
+@keyframes pulse {
+    0% { transform: scale(1); }
+    50% { transform: scale(1.08); }
+    100% { transform: scale(1); }
+}
+
+.login-box h2 {
+    text-align: center;
+    font-size: 1.6rem;
+    margin-bottom: 5px;
+}
+
+.subtitle {
+    text-align: center;
+    color: var(--text-muted);
+    font-size: 0.95rem;
+    margin-bottom: 30px;
+}
+
+.input-group {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.input-group label {
+    color: var(--text-muted);
+    font-size: 0.9rem;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.input-group input {
+    background-color: var(--bg-element);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    padding: 14px;
+    border-radius: 6px;
+    outline: none;
+    font-size: 1rem;
+    transition: 0.3s;
+}
+
+.input-group input:focus {
+    border-color: var(--color-red);
+    box-shadow: 0 0 0 2px rgba(211, 47, 47, 0.2);
+}
+
+.options {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 0.9rem;
+    margin-bottom: 25px;
+}
+
+.remember {
+    color: var(--text-muted);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    cursor: pointer;
+}
+
+.forgot-password {
+    color: var(--color-red-light);
+    text-decoration: none;
+    transition: 0.3s;
+}
+
+.forgot-password:hover {
+    color: #ffffff;
+    text-decoration: underline;
+}
+
+.btn-primary {
+    background-color: var(--color-red);
+    color: #ffffff;
+    border: none;
+    padding: 14px;
+    border-radius: 6px;
+    cursor: pointer;
+    font-weight: bold;
+    font-size: 1.1rem;
+    transition: 0.3s;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.btn-primary:hover {
+    background-color: var(--color-red-light);
+    transform: translateY(-2px);
+    box-shadow: 0 5px 15px rgba(211, 47, 47, 0.3);
+}
+
+.full-width {
+    width: 100%;
+}
+.theme-btn-login {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    background-color: var(--bg-element);
+    color: var(--text-main);
+    border: 1px solid var(--border-color);
+    width: 45px;
+    height: 45px;
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.2rem;
+    transition: 0.3s;
+    z-index: 10;
+}
+
+.theme-btn-login:hover {
+    background-color: var(--color-red);
+    color: #ffffff;
+    border-color: var(--color-red);
+}

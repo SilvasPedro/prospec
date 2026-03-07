@@ -1,6 +1,7 @@
 // Importando via CDN para funcionar direto no navegador
 import { initializeApp } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-app.js";
 import { getFirestore } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-firestore.js";
+import { getAuth } from "https://www.gstatic.com/firebasejs/10.8.1/firebase-auth.js"; // <- NOVO IMPORT
 
 const firebaseConfig = {
   apiKey: "AIzaSyAdYMZA6viekwyMns0Z_uT0UUIw-imH6Hk",
@@ -14,5 +15,6 @@ const firebaseConfig = {
 // Inicializa o Firebase
 const app = initializeApp(firebaseConfig);
 
-// Inicializa e exporta o Firestore (Banco de dados)
+// Inicializa e exporta os serviços
 export const db = getFirestore(app);
+export const auth = getAuth(app); // <- EXPORTANDO A AUTENTICAÇÃO

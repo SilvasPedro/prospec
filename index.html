@@ -15,9 +15,18 @@
         <header>
             <div class="header-top">
                 <h1>Gestão de Prospecção</h1>
-                <button id="theme-toggle" class="theme-btn" aria-label="Alternar tema">
-                    <i class="fas fa-sun"></i>
-                </button>
+                <div class="header-actions">
+                    <div class="user-profile">
+                        <span class="welcome-text">Bem-vindo(a), <strong
+                                id="nome-usuario-display">Carregando...</strong></span>
+                        <button id="btn-logout" class="btn-logout" title="Sair da conta">
+                            <i class="fas fa-sign-out-alt"></i> Sair
+                        </button>
+                    </div>
+                    <button id="theme-toggle" class="theme-btn" aria-label="Alternar tema">
+                        <i class="fas fa-sun"></i>
+                    </button>
+                </div>
             </div>
             <div class="month-selector">
                 <button class="month-btn">Jan</button>
