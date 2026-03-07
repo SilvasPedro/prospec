@@ -4,6 +4,93 @@ import { collection, getDocs } from "https://www.gstatic.com/firebasejs/10.8.1/f
 const registrosCol = collection(db, "registros");
 let chartVisao, chartFunil;
 
+// --- ESTADOS DOS FILTROS ---
+const dataSistema = new Date(); // Pega a data atual do computador
+let filtroMes = dataSistema.getMonth(); // 0 (Jan) a 11 (Dez)
+let filtroPeriodo = 'Diário'; // 'Diário', 'Semanal', 'Mensal'
+let filtroColaborador = 'todos';
+
+// --- INICIALIZAÇÃO DA UI DOS FILTROS ---
+function inicializarFiltros() {
+    // Configura os botões de meses
+    const monthBtns = document.querySelectorAll('.month-btn');
+    monthBtns.forEach((btn, index) => {
+        btn.classList.remove('active');
+        if (index === filtroMes) btn.classList.add('active'); // Marca o mês atual na tela
+
+        btn.addEventListener('click', (e) => {
+            monthBtns.forEach(b => b.classList.remove('active'));
+            e.target.classList.add('active');
+            filtroMes = index;
+            // Se clicar em um mês específico, faz sentido mudar o período para "Mensal"
+            mudarPeriodoUI('Mensal');
+            carregarDashboard();
+        });
+    });
+
+    // Configura os botões de Período (Diário, Semanal, Mensal)
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.addEventListener('click', (e) => {
+            mudarPeriodoUI(e.target.innerText.trim());
+            carregarDashboard();
+        });
+    });
+
+    // Configura o Select de Colaboradores
+    const selectColab = document.querySelector('.collaborator-select');
+    selectColab.addEventListener('change', (e) => {
+        filtroColaborador = e.target.value;
+        carregarDashboard();
+    });
+
+    mudarPeriodoUI('Diário'); // Inicia focado nos resultados do dia
+}
+
+function mudarPeriodoUI(periodo) {
+    filtroPeriodo = periodo;
+    document.querySelectorAll('.filter-btn').forEach(btn => {
+        btn.classList.remove('active');
+        if (btn.innerText.trim() === periodo) {
+            btn.classList.add('active');
+        }
+    });
+}
+
+// --- LÓGICA DE VALIDAÇÃO DE DATA ---
+function verificaFiltroData(dataString) {
+    if (!dataString) return false;
+    
+    // dataString vem no formato "YYYY-MM-DD" do input type="date"
+    const [ano, mes, dia] = dataString.split('-').map(Number);
+    const dataRegistro = new Date(ano, mes - 1, dia);
+    
+    if (filtroPeriodo === 'Mensal') {
+        // Verifica se o registro pertence ao mês selecionado na barra de meses e ao ano atual
+        return dataRegistro.getMonth() === filtroMes && dataRegistro.getFullYear() === dataSistema.getFullYear();
+    } 
+    else if (filtroPeriodo === 'Diário') {
+        // Verifica se é EXATAMENTE a mesma data de hoje
+        return dataRegistro.getDate() === dataSistema.getDate() && 
+               dataRegistro.getMonth() === dataSistema.getMonth() && 
+               dataRegistro.getFullYear() === dataSistema.getFullYear();
+    }
+    else if (filtroPeriodo === 'Semanal') {
+        // Verifica se está na semana atual (Domingo a Sábado)
+        const inicioSemana = new Date(dataSistema);
+        inicioSemana.setDate(dataSistema.getDate() - dataSistema.getDay()); // Volta pro Domingo
+        inicioSemana.setHours(0,0,0,0);
+        
+        const fimSemana = new Date(inicioSemana);
+        fimSemana.setDate(inicioSemana.getDate() + 6); // Vai pro Sábado
+        fimSemana.setHours(23,59,59,999);
+        
+        return dataRegistro >= inicioSemana && dataRegistro <= fimSemana;
+    }
+    
+    return true;
+}
+
+// --- CARREGAMENTO E CÁLCULO DE DADOS ---
 export async function carregarDashboard() {
     try {
         const querySnapshot = await getDocs(registrosCol);
@@ -11,9 +98,20 @@ export async function carregarDashboard() {
         let totais = { clientes: 0, conversas: 0, propostas: 0, negociacoes: 0, vendas: 0 };
         let colaboradoresUnicos = new Set();
 
-        // Soma todos os dados
         querySnapshot.forEach((doc) => {
             const data = doc.data();
+            
+            // 1. Aplica o filtro de Colaborador
+            if (filtroColaborador !== 'todos' && data.colaboradorId !== filtroColaborador) {
+                return; // Ignora este registro e vai pro próximo
+            }
+            
+            // 2. Aplica o filtro de Data (Mês/Semana/Dia)
+            if (!verificaFiltroData(data.data)) {
+                return; // Ignora se não for da data selecionada
+            }
+
+            // Se passou pelos filtros, soma aos totais
             totais.clientes += data.clientes || 0;
             totais.conversas += data.conversas || 0;
             totais.propostas += data.propostas || 0;
@@ -22,9 +120,11 @@ export async function carregarDashboard() {
             colaboradoresUnicos.add(data.colaboradorId);
         });
 
+        // Se filtramos por um colaborador específico, a divisão de "média" será por 1.
+        // Se for "todos", divide pela quantidade de colaboradores que trabalharam no período.
         const qtdColaboradores = colaboradoresUnicos.size > 0 ? colaboradoresUnicos.size : 1;
 
-        // Atualiza os Totais na tela (os cards de baixo)
+        // --- ATUALIZAÇÃO DA TELA ---
         const totalBoxes = document.querySelectorAll('.totals-grid .total-box h4');
         if(totalBoxes.length >= 5) {
             totalBoxes[0].textContent = totais.clientes;
@@ -33,12 +133,10 @@ export async function carregarDashboard() {
             totalBoxes[3].textContent = totais.negociacoes;
             totalBoxes[4].textContent = totais.vendas;
             
-            // Conversão Total (Negociações -> Vendas)
             const conversaoTotal = totais.negociacoes > 0 ? ((totais.vendas / totais.negociacoes) * 100).toFixed(1) : 0;
             totalBoxes[5].textContent = `${conversaoTotal}%`;
         }
 
-        // Atualiza os KPIs (os cards de cima com a média por colaborador)
         const kpiCards = document.querySelectorAll('.kpi-card h2');
         if(kpiCards.length >= 6) {
             kpiCards[0].textContent = (totais.clientes / qtdColaboradores).toFixed(1);
@@ -47,12 +145,10 @@ export async function carregarDashboard() {
             kpiCards[3].textContent = (totais.negociacoes / qtdColaboradores).toFixed(1);
             kpiCards[4].textContent = (totais.vendas / qtdColaboradores).toFixed(1);
             
-            // Taxa Conv. KPI
             const conversaoKpi = totais.negociacoes > 0 ? ((totais.vendas / totais.negociacoes) * 100).toFixed(1) : 0;
             kpiCards[5].textContent = `${conversaoKpi}%`;
         }
 
-        // Atualiza as Taxas de Conversão do Funil
         const funilBoxes = document.querySelectorAll('.conversion-grid .total-box h4');
         if(funilBoxes.length >= 4) {
             funilBoxes[0].textContent = totais.clientes > 0 ? `${((totais.conversas / totais.clientes) * 100).toFixed(1)}%` : '0%';
@@ -61,7 +157,6 @@ export async function carregarDashboard() {
             funilBoxes[3].textContent = totais.clientes > 0 ? `${((totais.negociacoes / totais.clientes) * 100).toFixed(1)}%` : '0%';
         }
 
-        // Renderiza os Gráficos
         renderizarGraficos(totais);
 
     } catch (error) {
@@ -69,18 +164,15 @@ export async function carregarDashboard() {
     }
 }
 
+// --- RENDERIZAÇÃO DOS GRÁFICOS ---
 function renderizarGraficos(totais) {
-    // Cores baseadas no seu CSS
     const colorRed = '#d32f2f';
     const colorYellow = '#ffb74d';
     const colorGreen = '#4db6ac';
     const colorDarkRed = '#b71c1c';
     const textColor = document.documentElement.getAttribute('data-theme') === 'light' ? '#212529' : '#8b8d96';
 
-    // 1. Gráfico de Visão Geral (Barras Verticais)
     const ctxVisao = document.getElementById('chartVisaoGeral').getContext('2d');
-    
-    // Destrói o gráfico anterior se existir (para quando atualizar os dados)
     if (chartVisao) chartVisao.destroy();
     
     chartVisao = new Chart(ctxVisao, {
@@ -97,17 +189,15 @@ function renderizarGraficos(totais) {
         options: {
             responsive: true,
             maintainAspectRatio: false,
-            plugins: { legend: { display: false } }, // Esconde a legenda padrão pois já tem a sua em HTML
+            plugins: { legend: { display: false } },
             scales: {
-                y: { beginAtZero: true, ticks: { color: textColor } },
+                y: { beginAtZero: true, ticks: { color: textColor, precision: 0 } },
                 x: { ticks: { color: textColor } }
             }
         }
     });
 
-    // 2. Gráfico de Funil (Barras Horizontais)
     const ctxFunil = document.getElementById('chartFunil').getContext('2d');
-    
     if (chartFunil) chartFunil.destroy();
 
     chartFunil = new Chart(ctxFunil, {
@@ -122,17 +212,17 @@ function renderizarGraficos(totais) {
             }]
         },
         options: {
-            indexAxis: 'y', // Isso transforma a barra em horizontal (efeito funil)
+            indexAxis: 'y',
             responsive: true,
             maintainAspectRatio: false,
             plugins: { legend: { display: false } },
             scales: {
-                x: { beginAtZero: true, ticks: { color: textColor } },
+                x: { beginAtZero: true, ticks: { color: textColor, precision: 0 } },
                 y: { ticks: { color: textColor } }
             }
         }
     });
 }
 
-// Carrega os dados assim que o script é lido
-carregarDashboard();
+// Executa a inicialização ao carregar o arquivo
+inicializarFiltros();
