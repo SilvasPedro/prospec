@@ -1,7 +1,7 @@
 document.addEventListener('DOMContentLoaded', () => {
 
     const usuarioLogado = localStorage.getItem('usuarioLogado');
-    
+
     // Se não houver ninguém logado, redireciona para a tela de login (Simulação de proteção de rota)
     if (!usuarioLogado) {
         window.location.href = 'login.html';
@@ -23,7 +23,7 @@ document.addEventListener('DOMContentLoaded', () => {
             window.location.href = 'login.html';
         });
     }
-    
+
     // --- Lógica do Tema Claro/Escuro ---
     const themeToggleBtn = document.getElementById('theme-toggle');
     const themeIcon = themeToggleBtn.querySelector('i');
@@ -36,12 +36,12 @@ document.addEventListener('DOMContentLoaded', () => {
     themeToggleBtn.addEventListener('click', () => {
         const currentTheme = document.documentElement.getAttribute('data-theme');
         const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-        
+
         // Aplica o novo tema e salva no navegador
         document.documentElement.setAttribute('data-theme', newTheme);
         localStorage.setItem('hubdesk-theme', newTheme);
         updateIcon(newTheme);
-        
+
         // Recarrega a página silenciosamente para que os gráficos do Chart.js
         // sejam redesenhados com a cor de texto correta (clara ou escura)
         window.location.reload();
@@ -60,10 +60,14 @@ document.addEventListener('DOMContentLoaded', () => {
     // --- Elementos dos Modais ---
     const modalRegistro = document.getElementById('modal-registro');
     const modalColaboradores = document.getElementById('modal-colaboradores');
-    
+
+    const modalListaRegistros = document.getElementById('modal-lista-registros');
+    const btnGerenciarRegistros = document.getElementById('btn-gerenciar-registros');
+    const closeListaRegistros = document.getElementById('close-lista-registros');
+
     const btnNovoRegistro = document.getElementById('btn-novo-registro');
     const btnGerenciarEquipe = document.getElementById('btn-gerenciar-equipe');
-    
+
     const closeRegistro = document.getElementById('close-registro');
     const closeColaboradores = document.getElementById('close-colaboradores');
 
@@ -86,6 +90,16 @@ document.addEventListener('DOMContentLoaded', () => {
         modalColaboradores.classList.remove('active');
     });
 
+    btnGerenciarRegistros.addEventListener('click', () => {
+        modalListaRegistros.classList.add('active');
+        // Aciona a função que criaremos no registros.js para buscar os dados
+        if (window.carregarListaRegistros) window.carregarListaRegistros();
+    });
+
+    closeListaRegistros.addEventListener('click', () => {
+        modalListaRegistros.classList.remove('active');
+    });
+
     // Fechar modais ao clicar fora da caixa do modal
     window.addEventListener('click', (e) => {
         if (e.target === modalRegistro) {
@@ -93,6 +107,10 @@ document.addEventListener('DOMContentLoaded', () => {
         }
         if (e.target === modalColaboradores) {
             modalColaboradores.classList.remove('active');
+        }
+
+        if (e.target === modalListaRegistros) {
+            modalListaRegistros.classList.remove('active');
         }
     });
 });

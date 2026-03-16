@@ -9,6 +9,8 @@ const dataSistema = new Date(); // Pega a data atual do computador
 let filtroMes = dataSistema.getMonth(); // 0 (Jan) a 11 (Dez)
 let filtroPeriodo = 'Diário'; // 'Diário', 'Semanal', 'Mensal'
 let filtroColaborador = 'todos';
+let filtroDataInicioCustom = null;
+let filtroDataFimCustom = null;
 
 // --- INICIALIZAÇÃO DA UI DOS FILTROS ---
 function inicializarFiltros() {
@@ -43,8 +45,25 @@ function inicializarFiltros() {
         carregarDashboard();
     });
 
+    const btnAplicarFiltro = document.getElementById('btn-aplicar-filtro');
+    if (btnAplicarFiltro) {
+        btnAplicarFiltro.addEventListener('click', () => {
+            const dataInicio = document.getElementById('filtro-data-inicio').value;
+            const dataFim = document.getElementById('filtro-data-fim').value;
+
+            if (dataInicio && dataFim) {
+                filtroDataInicioCustom = dataInicio;
+                filtroDataFimCustom = dataFim;
+                mudarPeriodoUI('Personalizado');
+                carregarDashboard();
+            } else {
+                alert("Por favor, selecione as datas de início e fim.");
+            }
+        });
+    }
+
     mudarPeriodoUI('Diário'); // Inicia focado nos resultados do dia
-    
+
     // --- ADICIONE ESTA LINHA ABAIXO ---
     carregarDashboard(); // Força o carregamento dos dados assim que a página abre
 }
@@ -62,34 +81,49 @@ function mudarPeriodoUI(periodo) {
 // --- LÓGICA DE VALIDAÇÃO DE DATA ---
 function verificaFiltroData(dataString) {
     if (!dataString) return false;
-    
+
     // dataString vem no formato "YYYY-MM-DD" do input type="date"
     const [ano, mes, dia] = dataString.split('-').map(Number);
     const dataRegistro = new Date(ano, mes - 1, dia);
-    
+
     if (filtroPeriodo === 'Mensal') {
         // Verifica se o registro pertence ao mês selecionado na barra de meses e ao ano atual
         return dataRegistro.getMonth() === filtroMes && dataRegistro.getFullYear() === dataSistema.getFullYear();
-    } 
+    }
     else if (filtroPeriodo === 'Diário') {
         // Verifica se é EXATAMENTE a mesma data de hoje
-        return dataRegistro.getDate() === dataSistema.getDate() && 
-               dataRegistro.getMonth() === dataSistema.getMonth() && 
-               dataRegistro.getFullYear() === dataSistema.getFullYear();
+        return dataRegistro.getDate() === dataSistema.getDate() &&
+            dataRegistro.getMonth() === dataSistema.getMonth() &&
+            dataRegistro.getFullYear() === dataSistema.getFullYear();
     }
     else if (filtroPeriodo === 'Semanal') {
         // Verifica se está na semana atual (Domingo a Sábado)
         const inicioSemana = new Date(dataSistema);
         inicioSemana.setDate(dataSistema.getDate() - dataSistema.getDay()); // Volta pro Domingo
-        inicioSemana.setHours(0,0,0,0);
-        
+        inicioSemana.setHours(0, 0, 0, 0);
+
         const fimSemana = new Date(inicioSemana);
         fimSemana.setDate(inicioSemana.getDate() + 6); // Vai pro Sábado
-        fimSemana.setHours(23,59,59,999);
-        
+        fimSemana.setHours(23, 59, 59, 999);
+
         return dataRegistro >= inicioSemana && dataRegistro <= fimSemana;
     }
-    
+
+    // NA FUNÇÃO verificaFiltroData(dataString), ADICIONE ESTA CONDIÇÃO (logo antes do "return true;" no final da função)
+    else if (filtroPeriodo === 'Personalizado' && filtroDataInicioCustom && filtroDataFimCustom) {
+        // Converte as strings YYYY-MM-DD para objetos Date isolando o fuso horário
+        const inicioParts = filtroDataInicioCustom.split('-').map(Number);
+        const fimParts = filtroDataFimCustom.split('-').map(Number);
+
+        const dataInicioObj = new Date(inicioParts[0], inicioParts[1] - 1, inicioParts[2]);
+        dataInicioObj.setHours(0, 0, 0, 0);
+
+        const dataFimObj = new Date(fimParts[0], fimParts[1] - 1, fimParts[2]);
+        dataFimObj.setHours(23, 59, 59, 999);
+
+        return dataRegistro >= dataInicioObj && dataRegistro <= dataFimObj;
+    }
+
     return true;
 }
 
@@ -97,18 +131,18 @@ function verificaFiltroData(dataString) {
 export async function carregarDashboard() {
     try {
         const querySnapshot = await getDocs(registrosCol);
-        
+
         let totais = { clientes: 0, conversas: 0, propostas: 0, negociacoes: 0, vendas: 0 };
         let colaboradoresUnicos = new Set();
 
         querySnapshot.forEach((doc) => {
             const data = doc.data();
-            
+
             // 1. Aplica o filtro de Colaborador
             if (filtroColaborador !== 'todos' && data.colaboradorId !== filtroColaborador) {
                 return; // Ignora este registro e vai pro próximo
             }
-            
+
             // 2. Aplica o filtro de Data (Mês/Semana/Dia)
             if (!verificaFiltroData(data.data)) {
                 return; // Ignora se não for da data selecionada
@@ -129,31 +163,31 @@ export async function carregarDashboard() {
 
         // --- ATUALIZAÇÃO DA TELA ---
         const totalBoxes = document.querySelectorAll('.totals-grid .total-box h4');
-        if(totalBoxes.length >= 5) {
+        if (totalBoxes.length >= 5) {
             totalBoxes[0].textContent = totais.clientes;
             totalBoxes[1].textContent = totais.conversas;
             totalBoxes[2].textContent = totais.propostas;
             totalBoxes[3].textContent = totais.negociacoes;
             totalBoxes[4].textContent = totais.vendas;
-            
+
             const conversaoTotal = totais.negociacoes > 0 ? ((totais.vendas / totais.negociacoes) * 100).toFixed(1) : 0;
             totalBoxes[5].textContent = `${conversaoTotal}%`;
         }
 
         const kpiCards = document.querySelectorAll('.kpi-card h2');
-        if(kpiCards.length >= 6) {
+        if (kpiCards.length >= 6) {
             kpiCards[0].textContent = (totais.clientes / qtdColaboradores).toFixed(1);
             kpiCards[1].textContent = (totais.conversas / qtdColaboradores).toFixed(1);
             kpiCards[2].textContent = (totais.propostas / qtdColaboradores).toFixed(1);
             kpiCards[3].textContent = (totais.negociacoes / qtdColaboradores).toFixed(1);
             kpiCards[4].textContent = (totais.vendas / qtdColaboradores).toFixed(1);
-            
+
             const conversaoKpi = totais.negociacoes > 0 ? ((totais.vendas / totais.negociacoes) * 100).toFixed(1) : 0;
             kpiCards[5].textContent = `${conversaoKpi}%`;
         }
 
         const funilBoxes = document.querySelectorAll('.conversion-grid .total-box h4');
-        if(funilBoxes.length >= 4) {
+        if (funilBoxes.length >= 4) {
             funilBoxes[0].textContent = totais.clientes > 0 ? `${((totais.conversas / totais.clientes) * 100).toFixed(1)}%` : '0%';
             funilBoxes[1].textContent = totais.conversas > 0 ? `${((totais.propostas / totais.conversas) * 100).toFixed(1)}%` : '0%';
             funilBoxes[2].textContent = totais.propostas > 0 ? `${((totais.negociacoes / totais.propostas) * 100).toFixed(1)}%` : '0%';
@@ -177,7 +211,7 @@ function renderizarGraficos(totais) {
 
     const ctxVisao = document.getElementById('chartVisaoGeral').getContext('2d');
     if (chartVisao) chartVisao.destroy();
-    
+
     chartVisao = new Chart(ctxVisao, {
         type: 'bar',
         data: {

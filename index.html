@@ -45,10 +45,19 @@
         </header>
 
         <div class="controls-bar">
-            <div class="time-filters">
+            <div class="time-filters" style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
                 <button class="filter-btn active">Diário</button>
                 <button class="filter-btn">Semanal</button>
                 <button class="filter-btn">Mensal</button>
+
+                <div class="custom-date-filter"
+                    style="display: flex; align-items: center; gap: 5px; margin-left: 10px;">
+                    <input type="date" id="filtro-data-inicio" class="date-input">
+                    <span style="color: var(--text-muted); font-size: 0.9rem;">até</span>
+                    <input type="date" id="filtro-data-fim" class="date-input">
+                    <button id="btn-aplicar-filtro" class="btn-secondary"
+                        style="padding: 6px 12px; font-size: 0.9rem;">Aplicar</button>
+                </div>
             </div>
             <div class="actions">
                 <select class="collaborator-select">
@@ -56,6 +65,9 @@
                 </select>
                 <button id="btn-gerenciar-equipe" class="btn-secondary" title="Gerenciar Equipe">
                     <i class="fas fa-users-cog"></i>
+                </button>
+                <button id="btn-gerenciar-registros" class="btn-secondary" title="Gerenciar Lançamentos">
+                    <i class="fas fa-list"></i>
                 </button>
                 <button id="btn-novo-registro" class="btn-primary">
                     <i class="fas fa-plus"></i> Registrar
@@ -219,6 +231,7 @@
             </div>
             <div class="modal-body">
                 <form id="form-registro">
+                    <input type="hidden" id="reg-id">
                     <div class="input-group full-width">
                         <label>Colaborador</label>
                         <select id="reg-colaborador" required>
@@ -256,6 +269,21 @@
             </div>
         </div>
     </div>
+
+    <div id="modal-lista-registros" class="modal">
+    <div class="modal-content" style="max-width: 600px;">
+        <div class="modal-header">
+            <h2>Gerenciar Registros</h2>
+            <span class="close-btn" id="close-lista-registros">&times;</span>
+        </div>
+        <div class="modal-body">
+            <div class="lista-colaboradores">
+                <ul id="ul-registros">
+                    </ul>
+            </div>
+        </div>
+    </div>
+</div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 

@@ -529,3 +529,102 @@ header h1 {
         justify-content: space-between;
     }
 }
+
+/* ADICIONE NO FINAL DO SEU style.css */
+.date-input {
+    background-color: var(--bg-element);
+    border: 1px solid var(--border-color);
+    color: var(--text-main);
+    padding: 6px 10px;
+    border-radius: 6px;
+    outline: none;
+    font-size: 0.9rem;
+    transition: 0.3s;
+}
+
+.date-input:focus {
+    border-color: var(--color-red);
+}
+
+/* --- ESTILOS PARA A LISTA DE REGISTROS (GERENCIAR) --- */
+#ul-registros {
+    list-style: none; /* Remove as bolinhas feias */
+    max-height: 400px;
+    overflow-y: auto;
+    padding-right: 5px; /* Espaço pro scroll */
+}
+
+#ul-registros li {
+    background-color: var(--bg-element);
+    border: 1px solid var(--border-color);
+    padding: 15px;
+    margin-bottom: 12px;
+    border-radius: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    transition: 0.2s;
+}
+
+#ul-registros li:hover {
+    border-color: var(--color-red);
+    transform: translateY(-2px); /* Efeito de flutuar ao passar o mouse */
+    box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.registro-info {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    flex: 1; 
+}
+
+.registro-header {
+    font-size: 1.05rem;
+    color: var(--text-main);
+}
+
+.registro-data {
+    color: var(--text-muted);
+    font-size: 0.85rem;
+    margin-left: 8px;
+    font-weight: normal;
+}
+
+/* Transformando os números em pequenos "Badges" */
+.registro-stats {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+}
+
+.stat-badge {
+    background-color: var(--bg-panel);
+    border: 1px solid var(--border-color);
+    padding: 4px 8px;
+    border-radius: 4px;
+    font-size: 0.8rem;
+    color: var(--text-muted);
+}
+
+.stat-badge strong {
+    color: var(--text-main);
+}
+
+#ul-registros .acoes {
+    display: flex;
+    gap: 15px;
+    margin-left: 15px;
+}
+
+/* Customização da barra de rolagem da lista */
+#ul-registros::-webkit-scrollbar {
+    width: 6px;
+}
+#ul-registros::-webkit-scrollbar-track {
+    background: var(--bg-panel); 
+}
+#ul-registros::-webkit-scrollbar-thumb {
+    background: var(--border-color); 
+    border-radius: 10px;
+}
