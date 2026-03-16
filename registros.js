@@ -5,6 +5,7 @@ import { carregarDashboard } from './dashboard.js';
 const formRegistro = document.getElementById('form-registro');
 const modalRegistro = document.getElementById('modal-registro');
 const btnSalvar = formRegistro.querySelector('button[type="submit"]');
+let todosRegistrosGlobais = [];
 
 // Referência para a coleção de registros no banco de dados
 const registrosCol = collection(db, "registros");
@@ -67,51 +68,89 @@ formRegistro.addEventListener('submit', async (e) => {
 window.carregarListaRegistros = async () => {
     const ulRegistros = document.getElementById('ul-registros');
     ulRegistros.innerHTML = '<li>Carregando registros...</li>';
-
+    
     try {
         const querySnapshot = await getDocs(registrosCol);
-        ulRegistros.innerHTML = '';
-
-        if (querySnapshot.empty) {
-            ulRegistros.innerHTML = '<li>Nenhum registro encontrado.</li>';
-            return;
-        }
-
-        // Transforma os dados em array e ordena do mais recente para o mais antigo
-        let registrosArray = [];
-        querySnapshot.forEach(doc => registrosArray.push({ id: doc.id, ...doc.data() }));
-        registrosArray.sort((a, b) => new Date(b.data) - new Date(a.data));
-
-        registrosArray.forEach((registro) => {
-            const li = document.createElement('li');
-            const dataFormatada = registro.data.split('-').reverse().join('/'); // Ex: 2024-03-20 vira 20/03/2024
-
-            li.innerHTML = `
-                <div class="registro-info">
-                    <div class="registro-header">
-                        <strong>${registro.colaboradorNome}</strong> 
-                        <span class="registro-data"><i class="far fa-calendar-alt"></i> ${dataFormatada}</span>
-                    </div>
-                    <div class="registro-stats">
-                        <span class="stat-badge" title="Clientes">Cli: <strong>${registro.clientes}</strong></span>
-                        <span class="stat-badge" title="Conversas">Conv: <strong>${registro.conversas}</strong></span>
-                        <span class="stat-badge" title="Propostas">Prop: <strong>${registro.propostas}</strong></span>
-                        <span class="stat-badge" title="Negociações">Neg: <strong>${registro.negociacoes}</strong></span>
-                        <span class="stat-badge" title="Vendas">Ven: <strong>${registro.vendas}</strong></span>
-                    </div>
-                </div>
-                <div class="acoes">
-                    <button class="btn-edit" title="Editar" onclick="window.editarRegistro('${registro.id}', '${registro.colaboradorId}', '${registro.data}', ${registro.clientes}, ${registro.conversas}, ${registro.propostas}, ${registro.negociacoes}, ${registro.vendas})"><i class="fas fa-edit"></i></button>
-                    <button class="btn-delete" title="Excluir" onclick="window.deletarRegistro('${registro.id}')"><i class="fas fa-trash"></i></button>
-                </div>
-            `;
-            ulRegistros.appendChild(li);
+        todosRegistrosGlobais = []; // Limpa o array para não duplicar
+        
+        querySnapshot.forEach(doc => {
+            todosRegistrosGlobais.push({ id: doc.id, ...doc.data() });
         });
+        
+        // Ordena do mais recente para o mais antigo
+        todosRegistrosGlobais.sort((a, b) => new Date(b.data) - new Date(a.data));
+        
+        // Chama a função que desenha a tela passando todos os dados
+        window.renderizarListaRegistros(todosRegistrosGlobais);
+        
+        // Limpa o campo de busca sempre que o modal for reaberto
+        const inputBusca = document.getElementById('input-busca-registros');
+        if(inputBusca) inputBusca.value = "";
+
     } catch (error) {
         console.error("Erro ao carregar lista: ", error);
         ulRegistros.innerHTML = '<li>Erro ao carregar os dados.</li>';
     }
 };
+
+// 2. FUNÇÃO QUE DESENHA OS CARDS NA TELA (Separada para podermos filtrar facilmente)
+window.renderizarListaRegistros = (lista) => {
+    const ulRegistros = document.getElementById('ul-registros');
+    ulRegistros.innerHTML = '';
+    
+    if (lista.length === 0) {
+        ulRegistros.innerHTML = '<li style="justify-content: center; color: var(--text-muted);">Nenhum registro encontrado.</li>';
+        return;
+    }
+
+    lista.forEach((registro) => {
+        const li = document.createElement('li');
+        const dataFormatada = registro.data.split('-').reverse().join('/'); // Ex: 2026-03-20 vira 20/03/2026
+        
+        li.innerHTML = `
+            <div class="registro-info">
+                <div class="registro-header">
+                    <strong>${registro.colaboradorNome}</strong> 
+                    <span class="registro-data"><i class="far fa-calendar-alt"></i> ${dataFormatada}</span>
+                </div>
+                <div class="registro-stats">
+                    <span class="stat-badge" title="Clientes">Cli: <strong>${registro.clientes}</strong></span>
+                    <span class="stat-badge" title="Conversas">Conv: <strong>${registro.conversas}</strong></span>
+                    <span class="stat-badge" title="Propostas">Prop: <strong>${registro.propostas}</strong></span>
+                    <span class="stat-badge" title="Negociações">Neg: <strong>${registro.negociacoes}</strong></span>
+                    <span class="stat-badge" title="Vendas">Ven: <strong>${registro.vendas}</strong></span>
+                </div>
+            </div>
+            <div class="acoes">
+                <button class="btn-edit" title="Editar" onclick="window.editarRegistro('${registro.id}', '${registro.colaboradorId}', '${registro.data}', ${registro.clientes}, ${registro.conversas}, ${registro.propostas}, ${registro.negociacoes}, ${registro.vendas})"><i class="fas fa-edit"></i></button>
+                <button class="btn-delete" title="Excluir" onclick="window.deletarRegistro('${registro.id}')"><i class="fas fa-trash"></i></button>
+            </div>
+        `;
+        ulRegistros.appendChild(li);
+    });
+};
+
+// 3. LÓGICA DA BARRA DE PESQUISA (Adicione no final do arquivo registros.js)
+const inputBusca = document.getElementById('input-busca-registros');
+if (inputBusca) {
+    // O evento 'input' dispara a cada letra que o usuário digita
+    inputBusca.addEventListener('input', (e) => {
+        const termo = e.target.value.toLowerCase();
+        
+        // Filtra o array global buscando ocorrências no nome ou na data
+        const filtrados = todosRegistrosGlobais.filter(registro => {
+            const dataFormatada = registro.data.split('-').reverse().join('/'); // Para permitir buscar por "10/03"
+            
+            const matchNome = registro.colaboradorNome.toLowerCase().includes(termo);
+            const matchData = registro.data.includes(termo) || dataFormatada.includes(termo);
+            
+            return matchNome || matchData;
+        });
+        
+        // Redesenha a lista apenas com os resultados filtrados
+        window.renderizarListaRegistros(filtrados);
+    });
+}
 
 window.deletarRegistro = async (id) => {
     if (confirm("Tem certeza que deseja excluir este lançamento permanentemente?")) {

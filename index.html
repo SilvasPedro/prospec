@@ -271,19 +271,28 @@
     </div>
 
     <div id="modal-lista-registros" class="modal">
-    <div class="modal-content" style="max-width: 600px;">
-        <div class="modal-header">
-            <h2>Gerenciar Registros</h2>
-            <span class="close-btn" id="close-lista-registros">&times;</span>
-        </div>
-        <div class="modal-body">
-            <div class="lista-colaboradores">
-                <ul id="ul-registros">
+        <div class="modal-content" style="max-width: 600px;">
+            <div class="modal-header">
+                <h2>Gerenciar Registros</h2>
+
+                <span class="close-btn" id="close-lista-registros">&times;</span>
+            </div>
+            <div class="search-container" style="margin-bottom: 15px;">
+                <div class="input-group" style="position: relative;">
+                    <i class="fas fa-search search-icon"
+                        style="position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--text-muted); pointer-events: none;"></i>
+                    <input type="text" id="input-busca-registros" placeholder="Buscar por nome ou data (ex: 10/03)..."
+                        style="padding-left: 35px; width: 100%;">
+                </div>
+            </div>
+            <div class="modal-body">
+                <div class="lista-colaboradores">
+                    <ul id="ul-registros">
                     </ul>
+                </div>
             </div>
         </div>
     </div>
-</div>
 
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 
